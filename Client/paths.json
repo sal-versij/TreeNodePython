@@ -1,0 +1,35 @@
+{
+  "type": "Root",
+  "name": "",
+  "alias": [],
+  "children": [
+    {
+      "type": "Page",
+      "path": "./index.html",
+      "name": "index",
+      "alias": [
+        "home",
+        ""
+      ]
+    },
+    {
+      "type": "Folder",
+      "name": "a",
+      "alias": [],
+      "children": [
+        {
+          "type": "Page",
+          "path": "./main.html",
+          "name": "main",
+          "alias": []
+        }
+      ]
+    },
+    {
+      "type": "Command",
+      "namespace": "main",
+      "name": "print",
+      "alias": []
+    }
+  ]
+}

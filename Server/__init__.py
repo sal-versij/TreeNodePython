@@ -71,8 +71,7 @@ class Entry:
 		return self.request(_)
 	
 	def __truediv__(self, _):
-		_.__rtruediv__(self)
-		return self
+		return _.__rtruediv__(self)
 	
 	def __str__(self):
 		_ = '{'
@@ -86,9 +85,9 @@ class Entry:
 class Folder(Entry):
 	type = "Folder"
 	
-	def __init__(self, name, *alias, children=dict()):
+	def __init__(self, name, *alias, children=None):
 		Entry.__init__(self, name, *alias)
-		self.children = children
+		self.children = children or {}
 	
 	def retrieve(self, _):
 		if _[0] in self.children:
@@ -224,6 +223,7 @@ async def main():
 	(p2 / f1, p1, c1) / root
 	
 	root.save_to_json(r'./paths.json')
+	r.load_from_json(r'./paths.json')
 	
 	h = handler(root)
 	server = HTTPServer(('', PORT_NUMBER), h)
