@@ -1,8 +1,12 @@
 {
   "type": "Root",
-  "name": "",
-  "alias": [],
   "children": [
+    {
+      "type": "Command",
+      "namespace": "main",
+      "name": "print",
+      "alias": []
+    },
     {
       "type": "Page",
       "path": "./index.html",
@@ -24,12 +28,6 @@
           "alias": []
         }
       ]
-    },
-    {
-      "type": "Command",
-      "namespace": "main",
-      "name": "print",
-      "alias": []
     }
   ]
 }

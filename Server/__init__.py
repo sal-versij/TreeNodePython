@@ -56,6 +56,7 @@ def handler(root):
 
 class Entry:
 	type = "Entry"
+	types = dict()
 	
 	def __init__(self, name, *alias):
 		self.name = name
@@ -74,12 +75,23 @@ class Entry:
 		return _.__rtruediv__(self)
 	
 	def __str__(self):
-		_ = '{'
-		_ += '"type":"' + self.type + '",'
-		_ += '"name":"' + self.name + '",'
-		_ += '"alias":' + str([i for i in self.alias]).replace("'", '"')
-		_ += '}'
-		return _
+		return json.dumps(self, default=lambda o: o.__dict__(), indent=2)
+	
+	def __dict__(self):
+		return {
+			"type": self.type,
+			"name": self.name,
+			"alias": self.alias,
+		}
+	
+	@staticmethod
+	def __from_dict__(_):
+		if Entry.type == _["type"]:
+			return Entry(_["name"], *_["alias"])
+		elif _["type"] in Entry.types:
+			return Entry.types[_["type"]].__from_dict__(_)
+		else:
+			raise Exception("Type unrecognized")
 
 
 class Folder(Entry):
@@ -96,7 +108,7 @@ class Folder(Entry):
 			else:
 				return self.children[_[0]]
 	
-	def __children_list(self):
+	def children_list(self):
 		for i in set([j for j in self.children.values()]):
 			yield i
 	
@@ -115,15 +127,26 @@ class Folder(Entry):
 	def __getitem__(self, _):
 		return self.retrieve(_.split('/')[1:])
 	
-	def __str__(self):
-		_ = '{'
-		_ += '"type":"' + self.type + '",'
-		_ += '"name":"' + self.name + '",'
-		_ += '"alias":' + str([i for i in self.alias]).replace("'", '"') + ','
-		_ += '"children":['
-		_ += ','.join([str(i) for i in self.__children_list()])
-		_ += ']}'
-		return _
+	def __dict__(self):
+		return {
+			"type": self.type,
+			"name": self.name,
+			"alias": self.alias,
+			"children": [*self.children_list()],
+		}
+	
+	@staticmethod
+	def __from_dict__(_):
+		if Folder.type == _["type"]:
+			__ = Folder(_["name"], *_["alias"])
+			for i in _["children"]:
+				j = Entry.__from_dict__(i)
+				__.children[j.name] = j
+				for k in j.alias:
+					__.children[k] = j
+			return __
+		else:
+			return Entry.__from_dict__(_)
 
 
 class Page(Entry):
@@ -141,18 +164,25 @@ class Page(Entry):
 		
 		return [func], {'Content-type': 'text/html; charset=utf-8'}
 	
-	def __str__(self):
-		_ = '{'
-		_ += '"type":"' + self.type + '",'
-		_ += '"path":"' + self.path + '",'
-		_ += '"name":"' + self.name + '",'
-		_ += '"alias":' + str([i for i in self.alias]).replace("'", '"')
-		_ += '}'
-		return _
+	def __dict__(self):
+		return {
+			"type": self.type,
+			"path": self.path,
+			"name": self.name,
+			"alias": self.alias,
+		}
+	
+	@staticmethod
+	def __from_dict__(_):
+		if Page.type == _["type"]:
+			return Page(_["path"], _["name"], *_["alias"])
+		else:
+			return Entry.__from_dict__(_)
 
 
 class Command(Entry):
 	type = "Command"
+	namespaces = dict()
 	
 	def __init__(self, namespace, name, *alias):
 		Entry.__init__(self, name, *alias)
@@ -160,38 +190,73 @@ class Command(Entry):
 	
 	def request(self, _):
 		try:
-			return [json.dumps(self.namespace[self.name](self)).encode("utf-8")], {
+			return [json.dumps(Command.namespaces[self.namespace][self.name](self)).encode("utf-8")], {
 				'Content-type': 'application/json; charset=utf-8'
 			}
 		except Exception as e:
 			print(e)
 			return False
 	
-	def __str__(self):
-		_ = '{'
-		_ += '"type":"' + self.type + '",'
-		_ += '"namespace":"' + str(self.namespace) + '",'
-		_ += '"name":"' + self.name + '",'
-		_ += '"alias":' + str([i for i in self.alias]).replace("'", '"')
-		_ += '}'
-		return _
+	def __dict__(self):
+		return {
+			"type": self.type,
+			"namespace": str(self.namespace),
+			"name": self.name,
+			"alias": self.alias,
+		}
+	
+	@staticmethod
+	def __from_dict__(_):
+		if Command.type == _["type"]:
+			return Command(_["namespace"], _["name"], *_["alias"])
+		else:
+			return Entry.__from_dict__(_)
 
 
 class Root(Folder):
 	type = "Root"
 	
-	def __init__(self, commands={}):
+	def __init__(self):
 		Folder.__init__(self, "")
-		self.commands = commands
 	
 	def save_to_json(self, fname):
 		f = open(fname, 'w')
-		f.write(str(self))
+		f.write(json.dumps(self.__dict__(), default=lambda o: o.__dict__(), indent=2))
+		f.flush()
+		f.close()
 	
 	def load_from_json(self, fname):
 		f = open(fname, 'r')
 		a = json.loads(f.read())
 		print(a)
+		self.__from_dict__(a, self)
+		f.close()
+	
+	def __dict__(self):
+		return {
+			"type": self.type,
+			"children": [*self.children_list()],
+		}
+	
+	@staticmethod
+	def __from_dict__(_, self=None):
+		if self is not None:
+			for i in _["children"]:
+				j = Entry.__from_dict__(i)
+				self.children[j.name] = j
+				for k in j.alias:
+					self.children[k] = j
+			return self
+		if Root.type == _["type"]:
+			__ = Root()
+			for i in _["children"]:
+				j = Entry.__from_dict__(i)
+				__.children[j.name] = j
+				for k in j.alias:
+					__.children[k] = j
+			return __
+		else:
+			return Entry.__from_dict__(_)
 
 
 class CommandsNamespace:
@@ -210,22 +275,21 @@ class CommandsNamespace:
 
 
 async def main():
-	r = Root()
+	Entry.types[Entry.type] = Entry
+	Entry.types[Folder.type] = Folder
+	Entry.types[Page.type] = Page
+	Entry.types[Command.type] = Command
+	Entry.types[Root.type] = Root
 	
 	commands = CommandsNamespace("main")
-	commands['print'] = lambda self: print('meow')
-	root = Root(commands)
+	Command.namespaces[commands.name] = commands
+	commands['print'] = lambda self: {"a": 1, "b": "2", "c": "d"}
 	
-	p1 = Page('./index.html', 'index', 'home', '')
-	p2 = Page('./main.html', 'main')
-	c1 = Command(commands, 'print')
-	f1 = Folder("a")
-	(p2 / f1, p1, c1) / root
+	r = Root()
 	
-	root.save_to_json(r'./paths.json')
 	r.load_from_json(r'./paths.json')
 	
-	h = handler(root)
+	h = handler(r)
 	server = HTTPServer(('', PORT_NUMBER), h)
 	try:
 		print('Started http server on port ', PORT_NUMBER)
