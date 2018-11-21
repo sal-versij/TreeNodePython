@@ -287,7 +287,7 @@ async def main():
 	
 	r = Root()
 	
-	r.load_from_json(r'./paths.json')
+	r.load_from_json(r'./sitemap.json')
 	
 	h = handler(r)
 	server = HTTPServer(('', PORT_NUMBER), h)
