@@ -158,9 +158,9 @@ class Page(Entry):
 	
 	def request(self, _):
 		def func(f=open(self.path, 'r')):
-			out = f.read()
+			out = f.readlines()
 			f.close()
-			return bytes(out, 'utf-8')
+			return bytes(','.join(out), 'utf-8')
 		
 		return [func], {'Content-type': 'text/html; charset=utf-8'}
 	
