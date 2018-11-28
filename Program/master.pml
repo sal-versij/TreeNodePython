@@ -2,17 +2,17 @@
 
 <html>
 <head>
-    <# master.title #>
+    <# self.print(self["title"]) #>
     <meta charset="UTF-8">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css"
           integrity="sha256-OweaP/Ic6rsV+lysfyS4h+LM6sRwuO3euTYfr6M124g=" crossorigin="anonymous"/>
-    <# master.container(id="Head") #>
+    <# self.create_container(id="Head") #>
 </head>
 <body>
 <header></header>
 
 <section>
-    <# master.container(id="Body") #>
+    <# self.create_container(id="Body") #>
 </section>
 
 <footer></footer>
@@ -21,7 +21,7 @@
             integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"
             integrity="sha256-U/cHDMTIHCeMcvehBv1xQ052bPSbJtbuiw4QA9cTKz0=" crossorigin="anonymous"></script>
-    <# master.container(id="Scripts") #>
+    <# self.create_container(id="Scripts") #>
 </section>
 </body>
 </html>

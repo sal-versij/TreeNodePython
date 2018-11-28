@@ -10,6 +10,7 @@ class PageHandler:
 		self.containers = {None: Container()}
 		self.inherit = None
 		self.backend = None
+		self.data = {}
 		self.elaborate()
 	
 	def get_bytes(self):
@@ -22,15 +23,32 @@ class PageHandler:
 			if match:
 				eval(match[1], {'__builtins__': None}, {'self': self})
 			else:
-				self.containers[self.currentContainer].handle(striped)
+				self.handle(striped)
 		self.f.close()
 	
-	def header(self, inherit="", backend=""):
+	def handle(self, v):
+		if self.currentContainer in self.containers:
+			self.containers[self.currentContainer].handle(v)
+		elif self.inherit:
+			self.inherit.handle(v)
+	
+	def header(self, inherit="", backend="", **data):
 		self.inherit = PageHandler(open(inherit, 'r'))
 		self.backend = backend
+		self.data = data
+	
+	def create_container(self, id):
+		self.containers[id] = Container()
+		self.handle(self.containers[id])
 	
 	def container(self, id=None):
 		self.currentContainer = id
+	
+	def __getitem__(self, k):
+		if k in self.data:
+			return self.data[k]
+		else:
+			return None
 
 
 class Container:
