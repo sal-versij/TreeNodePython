@@ -9,7 +9,7 @@
     },
     {
       "type": "Page",
-      "path": "./index.html",
+      "path": "./index.pml",
       "name": "index",
       "alias": [
         "home",
@@ -23,7 +23,7 @@
       "children": [
         {
           "type": "Page",
-          "path": "./main.html",
+          "path": "./main.pml",
           "name": "main",
           "alias": []
         }

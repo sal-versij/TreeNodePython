@@ -1,3 +1,9 @@
+import collections
+import json
+
+from PageHandler import PageHandler as ph
+
+
 class Entry:
 	type = "Entry"
 	types = dict()
@@ -95,7 +101,6 @@ class Folder(Entry):
 
 class Page(Entry):
 	type = "Page"
-	prog = re.compile(r"<#(.*?)#>")
 	
 	def __init__(self, path, name, *alias):
 		Entry.__init__(self, name, *alias)
@@ -103,14 +108,8 @@ class Page(Entry):
 	
 	def request(self, _):
 		def func(f=open(self.path, 'r')):
-			out = []
-			for i in f.readlines():
-				_ = i.strip()
-				__ = self.prog.match(_)
-				eval(__[1])
-				out.append()
-			f.close()
-			return bytes(' '.join(out), 'utf-8')
+			_ = ph(f)
+			return bytes(_.get_bytes(), 'utf-8')
 		
 		return [func], {'Content-type': 'text/html; charset=utf-8'}
 	
