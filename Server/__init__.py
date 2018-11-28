@@ -1,6 +1,7 @@
 import asyncio
 import collections
 import json
+import re
 from http.server import BaseHTTPRequestHandler, HTTPServer
 
 PORT_NUMBER = 8080
@@ -151,6 +152,7 @@ class Folder(Entry):
 
 class Page(Entry):
 	type = "Page"
+	prog = re.compile(r"<#(.*?)#>")
 	
 	def __init__(self, path, name, *alias):
 		Entry.__init__(self, name, *alias)
@@ -158,9 +160,14 @@ class Page(Entry):
 	
 	def request(self, _):
 		def func(f=open(self.path, 'r')):
-			out = f.readlines()
+			out = []
+			for i in f.readlines():
+				_ = i.strip()
+				__ = self.prog.match(_)
+				eval(__[1])
+				out.append()
 			f.close()
-			return bytes(','.join(out), 'utf-8')
+			return bytes(' '.join(out), 'utf-8')
 		
 		return [func], {'Content-type': 'text/html; charset=utf-8'}
 	
