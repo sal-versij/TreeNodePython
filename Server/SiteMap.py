@@ -109,7 +109,7 @@ class Page(Entry):
 	def request(self, _):
 		def func(f=open(self.path, 'r')):
 			_ = ph(f)
-			return bytes(_.get_bytes(), 'utf-8')
+			return _.get_bytes()
 		
 		return [func], {'Content-type': 'text/html; charset=utf-8'}
 	

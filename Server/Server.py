@@ -37,7 +37,8 @@ def handler(root):
 			self.end_headers()
 			for i in _:
 				if hasattr(i, '__call__'):
-					self.wfile.write(i())
+					_ = i()
+					self.wfile.write(_)
 				else:
 					self.wfile.write(i)
 		

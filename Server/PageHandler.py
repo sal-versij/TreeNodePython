@@ -9,12 +9,12 @@ class PageHandler:
 		self.currentContainer = None
 		self.containers = {None: Container()}
 		self.inherit = None
-		self.backend = None
 		self.data = {}
 		self.elaborate()
 	
 	def get_bytes(self):
-		pass
+		_ = self.inherit and self.inherit.get_bytes() or bytes(str(self.containers[None]), "utf-8")
+		return _
 	
 	def elaborate(self):
 		for line in self.f.readlines():
@@ -26,19 +26,28 @@ class PageHandler:
 				self.handle(striped)
 		self.f.close()
 	
-	def handle(self, v):
-		if self.currentContainer in self.containers:
-			self.containers[self.currentContainer].handle(v)
+	def handle(self, v, cc=None):
+		cc = cc or self.currentContainer
+		if cc in self.containers:
+			self.containers[cc].handle(v)
 		elif self.inherit:
-			self.inherit.handle(v)
+			self.inherit.handle(v, cc)
 	
-	def header(self, inherit="", backend="", **data):
-		self.inherit = PageHandler(open(inherit, 'r'))
-		self.backend = backend
-		self.data = data
+	def header(self, inherit=None, **data):
+		try:
+			self.inherit = PageHandler(open(inherit, 'r'))
+			self.data = self.inherit.data
+		except:
+			pass
+		self.data.update(data)
+	
+	def print(self, f):
+		self.handle(Printed(f, self))
 	
 	def create_container(self, id):
 		self.containers[id] = Container()
+	
+	def set_container_point(self, id):
 		self.handle(self.containers[id])
 	
 	def container(self, id=None):
@@ -49,6 +58,15 @@ class PageHandler:
 			return self.data[k]
 		else:
 			return None
+
+
+class Printed:
+	def __init__(self, f, _):
+		self.f = f
+		self._ = _
+	
+	def __str__(self):
+		return self.f(self._)
 
 
 class Container:
@@ -62,4 +80,4 @@ class Container:
 		return self.html
 	
 	def __str__(self):
-		return ' '.join(self.html)
+		return ' '.join(str(i) for i in self.html)

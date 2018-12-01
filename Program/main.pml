@@ -1,10 +1,7 @@
-<# self.header(inherit="./master.html", backend="main.html.py") #>
+<# self.header(inherit="./master.pml") #>
 
-<# self.container(id="Head").start() #>
-<# self.end() #>
+<# self.container(id="Head") #>
 
-<# self.container(id="Body").start() #>
-<# self.end() #>
+<# self.container(id="Body") #>
 
-<# self.container(id="Scripts").start() #>
-<# self.end() #>
+<# self.container(id="Scripts") #>
