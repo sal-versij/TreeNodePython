@@ -15,19 +15,6 @@
         "home",
         ""
       ]
-    },
-    {
-      "type": "Folder",
-      "name": "a",
-      "alias": [],
-      "children": [
-        {
-          "type": "Page",
-          "path": "./main.pml",
-          "name": "main",
-          "alias": []
-        }
-      ]
     }
   ]
 }
