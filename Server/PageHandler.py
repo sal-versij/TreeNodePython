@@ -5,14 +5,21 @@ from pathlib import Path
 class PageHandler:
 	prog = re.compile(r"<#\s*(.*?)\s*#>")
 	
-	def __init__(self, f):
-		self.f = f
+	def __init__(self, path):
+		self.ok = False
+		self.f = None
+		self.path = path
+		if path and Path(path).exists():
+			self.f = open(path, 'r')
+		else:
+			return
 		self.currentContainer = None
 		self.containers = {None: Container()}
 		self.inherit = None
 		self.data = {}
 		self.__builtins = {}
 		self.elaborate()
+		self.ok = True
 	
 	def get_bytes(self):
 		_ = self.inherit and self.inherit.get_bytes() or bytes(str(self.containers[None]), "utf-8")
@@ -23,9 +30,10 @@ class PageHandler:
 			striped = line.strip()
 			match = self.prog.match(striped)
 			if match:
-				_ = match[1]
-				print(_)
-				eval(_, {'__builtins__': self.__builtins, 'self': self})
+				try:
+					eval(match[1], {'__builtins__': self.__builtins, 'self': self})
+				except Exception as e:
+					print(match[1], ": ", e)
 			else:
 				self.handle(striped)
 		self.f.close()
@@ -38,9 +46,11 @@ class PageHandler:
 		return True
 	
 	def header(self, inherit=None, **data):
-		if inherit and Path(inherit).exists():
-			self.inherit = PageHandler(open(inherit, 'r'))
+		self.inherit = PageHandler(inherit)
+		if self.inherit.ok:
 			self.data = self.inherit.data
+		else:
+			self.inherit = None
 		self.data.update(data)
 	
 	def print(self, f):

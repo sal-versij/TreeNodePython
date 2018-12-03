@@ -107,11 +107,7 @@ class Page(Entry):
 		self.path = path
 	
 	def request(self, _):
-		def func(f=open(self.path, 'r')):
-			_ = ph(f)
-			return _.get_bytes()
-		
-		return [func], {'Content-type': 'text/html; charset=utf-8'}
+		return [lambda: ph(self.path).get_bytes()], {'Content-type': 'text/html; charset=utf-8'}
 	
 	def __dict__(self):
 		return {
