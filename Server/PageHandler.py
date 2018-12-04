@@ -3,7 +3,7 @@ from pathlib import Path
 
 
 class PageHandler:
-	prog = re.compile(r"<#\s*(.*?)\s*#>")
+	prog = re.compile(r"<#\s*(.*?)\s*#\s*/>")
 	
 	def __init__(self, path):
 		self.ok = False
