@@ -158,11 +158,7 @@
 					, p2 = this.point(lastP.x, lastP.y)
 					, deltaP = [p2.x - p1.x, p2.y - p1.y]
 					, box = new SVG.Box(this.viewbox()).transform(new SVG.Matrix().translate(deltaP[0], deltaP[1]));
-				log(deltaP,box)
-				if (box.x < 0) deltaP[0] -= box.x;
-				if (box.y < 0) deltaP[1] -= box.y;
-				box = new SVG.Box(this.viewbox()).transform(new SVG.Matrix().translate(deltaP[0], deltaP[1]));
-				log(deltaP,box)
+				
 				this.viewbox(box);
 				lastP = currentP;
 			};
