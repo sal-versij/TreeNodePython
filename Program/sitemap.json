@@ -8,6 +8,11 @@
       "alias": []
     },
     {
+      "type": "ResourceFolder",
+      "name": "dist",
+      "path": "./dist"
+    },
+    {
       "type": "Page",
       "path": "./index.pml",
       "name": "index",

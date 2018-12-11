@@ -1,0 +1,127 @@
+/* ==========================================================================
+   Spacing Mixins
+   ========================================================================== */
+
+/**
+ * Define these spacing variables
+ */
+$spacing-base: 28px;
+$spacing-double: $spacing-base*2;
+$spacing-triple: $spacing-base*3;
+$spacing-half: $spacing-base/2;
+$spacing-quarter: $spacing-half/2;
+
+/*
+ * Make sure you keep the names & sizes consistent. You can add as many spacing
+ * sizes as you feel necessary
+ *
+ * @TODO: Use SASS Maps instead
+ */
+$spacing-size-names: (double, triple, half, quarter);
+$spacing-sizes: ($spacing-double, $spacing-triple, $spacing-half, $spacing-quarter);
+
+/**
+ * Spacing mixin loops through all of the sizes (set in the ui/variables file)
+ * and generates all the inivisble classes for margins and paddings.
+ */
+
+@mixin spacing($sides: (top, left, bottom, right), $types: (margin, padding)) {
+
+  /*
+   * Loop through each type
+   *
+   * e.g. margin, padding
+   */
+  @each $type in $types {
+
+    /* e.g. %padding { padding: $spacing-base }  */
+    %#{$type} { #{$type}: $spacing-base; }
+
+    /* e.g. %padding-none { padding: 0 }  */
+    %#{$type}-none { #{$type}: 0; }
+
+    /* e.g. %padding--ends */
+    %#{$type}--ends {
+      #{$type}-top: $spacing-base;
+      #{$type}-bottom: $spacing-base;
+    }
+
+    %#{$type}-none--ends {
+      #{$type}-top: 0;
+      #{$type}-bottom: 0;
+    }
+
+    /* e.g. %padding--sides */
+    %#{$type}--sides {
+      #{$type}-left: $spacing-base;
+      #{$type}-right: $spacing-base;
+    }
+
+    %#{$type}-none--sides {
+      #{$type}-left: 0;
+      #{$type}-right: 0;
+    }
+
+    /*
+     * Loop through each side and create the class for it
+     *
+     * e.g. padding--left: $amount
+     */
+    @each $side in $sides {
+      /* e.g. %padding--top */
+      %#{$type}--#{$side} {
+        #{$type}-#{$side}: $spacing-base;
+      }
+
+      %#{$type}-none--#{$side} {
+        #{$type}-#{$side}: 0;
+      }
+    }
+
+    /*
+     * Loop through each size
+     *
+     * e.g. double, triple, half, quarter
+     */
+    @each $size in $spacing-size-names {
+
+      /* get the index of the current item in the loop */
+      $i: index($spacing-size-names, $size);
+
+      /* get the spacing size for whichever size name we are on */
+      $spacing-size: nth($spacing-sizes, $i);
+
+      /* Base padding for each size */
+      %#{$type}-#{$size} { #{$type}: $spacing-size; }
+
+      /* e.g. %padding-large--ends */
+      %#{$type}-#{$size}--ends {
+        #{$type}-top: $spacing-size;
+        #{$type}-bottom: $spacing-size;
+      }
+
+      /* e.g. %padding-large--sides */
+      %#{$type}-#{$size}--sides {
+        #{$type}-left: $spacing-size;
+        #{$type}-right: $spacing-size;
+      }
+
+      /*
+       * Loop through each side and create the class for it
+       *
+       * e.g. padding-left: $amount, padding-right: $amount
+       */
+      @each $side in $sides {
+
+        /* e.g. %padding-large--top */
+        %#{$type}-#{$size}--#{$side} {
+          #{$type}-#{$side}: $spacing-size;
+        }
+
+      } // sides
+
+    } // sizes
+
+  } // types
+
+} // spacing

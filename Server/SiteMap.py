@@ -1,5 +1,8 @@
 import collections
 import json
+import mimetypes
+import os
+import subprocess
 
 from PageHandler import PageHandler as ph
 
@@ -57,6 +60,7 @@ class Folder(Entry):
 				return self.children[_[0]].retrieve(_[1:])
 			else:
 				return self.children[_[0]]
+		return None
 	
 	def children_list(self):
 		for i in set([j for j in self.children.values()]):
@@ -75,7 +79,10 @@ class Folder(Entry):
 		return self
 	
 	def __getitem__(self, _):
-		return self.retrieve(_.split('/')[1:])
+		_ = _.replace('\\', '/').split('/')
+		if len(_) > 1:
+			return self.retrieve(_[1:])
+		return None
 	
 	def __dict__(self):
 		return {
@@ -121,6 +128,98 @@ class Page(Entry):
 	def __from_dict__(_):
 		if Page.type == _["type"]:
 			return Page(_["path"], _["name"], *_["alias"])
+		else:
+			return Entry.__from_dict__(_)
+
+
+class SCSS(Entry):
+	type = "SCSS"
+	
+	def __init__(self, path, name, dist="./dist/"):
+		Entry.__init__(self, name)
+		self.path = path
+		self.dist = dist and dist or self.dist
+		subprocess.call(["cmd", "/d", "/c", "sass", f"{self.get_path()}:{self.get_dist()}"])
+	
+	def get_path(self):
+		return os.path.abspath(self.path)
+	
+	def get_dist(self):
+		return os.path.abspath(os.path.join(self.dist, self.name))
+	
+	def request(self, _):
+		return [lambda: ph(self.get_path()).get_bytes()], {'Content-type': 'text/css; charset=utf-8'}
+	
+	def __dict__(self):
+		return {
+			"type": self.type,
+			"path": self.path,
+			"name": self.name,
+			"dist": self.dist,
+		}
+	
+	@staticmethod
+	def __from_dict__(_):
+		if SCSS.type == _["type"]:
+			return SCSS(_["path"], _["name"], _["dist"])
+		else:
+			return Entry.__from_dict__(_)
+
+
+class Resource(Entry):
+	type = "Resource"
+	
+	def __init__(self, path, name):
+		Entry.__init__(self, name)
+		self.path = path
+		self.mime = mimetypes.MimeTypes().guess_type(self.path)
+		self.mime = self.mime[0]
+	
+	def request(self, _):
+		return [lambda: bytes(open(self.path).read(), 'utf-8')], {'Content-type': '{}; charset=utf-8'.format(self.mime)}
+	
+	def __dict__(self):
+		return {
+			"type": self.type,
+			"path": self.path,
+			"name": self.name,
+		}
+	
+	@staticmethod
+	def __from_dict__(_):
+		if Resource.type == _["type"]:
+			return Resource(_["path"], _["name"])
+		else:
+			return Entry.__from_dict__(_)
+
+
+class ResourceFolder(Folder):
+	type = "ResourceFolder"
+	
+	def __init__(self, name, path):
+		Entry.__init__(self, name)
+		self.children = {}
+		self.path = path
+		l = len(self.path)
+		for sd, ds, fs in os.walk(self.path):
+			print(sd, ds, fs)
+			_sd = sd[l:]
+			for d in ds:
+				Folder(d) / (self[_sd] or self)
+			for f in fs:
+				Resource(r"{}\{}".format(sd, f), f) / (self[_sd] or self)
+	
+	def __dict__(self):
+		return {
+			"type": self.type,
+			"name": self.name,
+			"path": self.path,
+		}
+	
+	@staticmethod
+	def __from_dict__(_):
+		if ResourceFolder.type == _["type"]:
+			return ResourceFolder(_["name"], _["path"])
 		else:
 			return Entry.__from_dict__(_)
 
@@ -224,3 +323,6 @@ Entry.types[Folder.type] = Folder
 Entry.types[Page.type] = Page
 Entry.types[Command.type] = Command
 Entry.types[Root.type] = Root
+Entry.types[SCSS.type] = SCSS
+Entry.types[Resource.type] = Resource
+Entry.types[ResourceFolder.type] = ResourceFolder

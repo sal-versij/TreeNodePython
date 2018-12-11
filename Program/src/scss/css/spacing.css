@@ -1,0 +1,18 @@
+/* ==========================================================================
+   Spacing Mixins
+   ========================================================================== */
+/**
+ * Define these spacing variables
+ */
+/*
+ * Make sure you keep the names & sizes consistent. You can add as many spacing
+ * sizes as you feel necessary
+ *
+ * @TODO: Use SASS Maps instead
+ */
+/**
+ * Spacing mixin loops through all of the sizes (set in the ui/variables file)
+ * and generates all the inivisble classes for margins and paddings.
+ */
+
+/*# sourceMappingURL=spacing.css.map */
