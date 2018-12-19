@@ -10,12 +10,13 @@
     <meta charset="UTF-8">
     <meta content="width=device-width, initial-scale=1, shrink-to-fit=no" name="viewport">
     <link href="/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/dist/css/flow-text.css" rel="stylesheet">
     <# self.set_container_point(id="Head") #/>
 </head>
 <body>
 <header class="navbar-fixed">
     <nav class="navbar navbar-dark bg-dark">
-        <a class="navbar-brand" href="/">Navbar</a>
+        <a class="navbar-brand" href="/">Python Tree Node Editor</a>
         <button aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation" class="navbar-toggler"
                 data-target="#navbarNav" data-toggle="collapse" type="button">
             <span class="navbar-toggler-icon"></span>
@@ -41,15 +42,10 @@
 <section>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
     <script src="/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/dist/js/holder.min.js"></script>
     <script src="https://use.fontawesome.com/releases/v5.5.0/js/all.js"></script>
 
     <script src="https://cdn.jsdelivr.net/gh/sal-versij/TurtleFrameWork@master/Utils.js"></script>
-
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/svg.js/2.7.1/svg.min.js"></script>
-    <script src="/dist/js/panzoom.js"></script>
-    <script src="https://cdn.jsdelivr.net/gh/jillix/svg.draggy.js/src/svg.draggy.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/gh/otm/svg.math.js/svg.math.min.js"></script>
-
     <# self.set_container_point(id="Scripts") #/>
 </section>
 </body>
